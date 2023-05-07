@@ -24,7 +24,7 @@ type foobarKey struct {
 func (o foobarKey) ID() string { return o.MyID }
 
 func TestNewDAG(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	if order := dag.GetOrder(); order != 0 {
 		t.Errorf("GetOrder() = %d, want 0", order)
 	}
@@ -34,7 +34,7 @@ func TestNewDAG(t *testing.T) {
 }
 
 func TestDAG_AddVertex(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 
 	// add a single vertex and inspect the graph
 	v := iVertex{1}
@@ -93,7 +93,7 @@ func TestDAG_AddVertex(t *testing.T) {
 }
 
 func TestDAG_AddVertex2(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	type testType struct{ value string }
 
 	v := testType{"1"}
@@ -122,7 +122,7 @@ func TestDAG_AddVertex2(t *testing.T) {
 }
 
 func TestDAG_AddVertexByID(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 
 	// add a single vertex and inspect the graph
 	v := iVertex{1}
@@ -169,7 +169,7 @@ func TestDAG_AddVertexByID(t *testing.T) {
 }
 
 func TestDAG_GetVertex(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1 := iVertex{1}
 	id, _ := dag.AddVertex(v1)
 	if v, _ := dag.GetVertex(id); v != v1 {
@@ -225,7 +225,7 @@ func TestDAG_GetVertex(t *testing.T) {
 }
 
 func TestDAG_DeleteVertex(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.AddVertex(iVertex{1})
 
 	// delete a single vertex and inspect the graph
@@ -321,7 +321,7 @@ func TestDAG_DeleteVertex(t *testing.T) {
 }
 
 func TestDAG_AddEdge(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v0, _ := dag.AddVertex("0")
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
@@ -413,7 +413,7 @@ func TestDAG_AddEdge(t *testing.T) {
 }
 
 func TestDAG_DeleteEdge(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v0, _ := dag.AddVertex(iVertex{0})
 	v1, _ := dag.AddVertex("1")
 	_ = dag.AddEdge(v0, v1)
@@ -468,7 +468,7 @@ func TestDAG_DeleteEdge(t *testing.T) {
 }
 
 func TestDAG_IsLeaf(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
 	v3, _ := dag.AddVertex("3")
@@ -493,7 +493,7 @@ func TestDAG_IsLeaf(t *testing.T) {
 }
 
 func TestDAG_IsRoot(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
 	v3, _ := dag.AddVertex("3")
@@ -518,7 +518,7 @@ func TestDAG_IsRoot(t *testing.T) {
 }
 
 func TestDAG_GetChildren(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
 	v3, _ := dag.AddVertex("3")
@@ -557,7 +557,7 @@ func TestDAG_GetChildren(t *testing.T) {
 }
 
 func TestDAG_GetParents(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.addVertex("1")
 	v2, _ := dag.addVertex("2")
 	v3, _ := dag.addVertex("3")
@@ -596,7 +596,7 @@ func TestDAG_GetParents(t *testing.T) {
 }
 
 func TestDAG_GetDescendants(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
 	v3, _ := dag.AddVertex("3")
@@ -651,7 +651,7 @@ func equal(a, b []string) bool {
 }
 
 func TestDAG_GetOrderedDescendants(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
 	v3, _ := dag.AddVertex("3")
@@ -697,7 +697,7 @@ func TestDAG_GetOrderedDescendants(t *testing.T) {
 }
 
 func TestDAG_GetDescendantsGraph(t *testing.T) {
-	d0 := NewDAG()
+	d0 := NewDAG[any]()
 
 	v1 := iVertex{1}
 	v1ID, _ := d0.AddVertex(v1)
@@ -813,7 +813,7 @@ func TestDAG_GetDescendantsGraph(t *testing.T) {
 }
 
 func TestDAG_GetAncestorsGraph(t *testing.T) {
-	d0 := NewDAG()
+	d0 := NewDAG[any]()
 
 	_, _ = d0.AddVertex(iVertex{1})
 	_, _ = d0.AddVertex(iVertex{2})
@@ -898,7 +898,7 @@ func TestDAG_GetAncestorsGraph(t *testing.T) {
 }
 
 func TestDAG_GetAncestors(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v0, _ := dag.AddVertex("0")
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
@@ -964,7 +964,7 @@ func TestDAG_GetAncestors(t *testing.T) {
 }
 
 func TestDAG_GetOrderedAncestors(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.addVertex("1")
 	v2, _ := dag.addVertex("2")
 	v3, _ := dag.addVertex("3")
@@ -1006,7 +1006,7 @@ func TestDAG_GetOrderedAncestors(t *testing.T) {
 }
 
 func TestDAG_AncestorsWalker(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
 	v3, _ := dag.AddVertex("3")
@@ -1063,7 +1063,7 @@ func TestDAG_AncestorsWalker(t *testing.T) {
 }
 
 func TestDAG_AncestorsWalkerSignal(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
@@ -1091,7 +1091,7 @@ func TestDAG_AncestorsWalkerSignal(t *testing.T) {
 }
 
 func TestDAG_ReduceTransitively(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	accountCreate, _ := dag.AddVertex("AccountCreate")
 	projectCreate, _ := dag.AddVertex("ProjectCreate")
 	networkCreate, _ := dag.AddVertex("NetworkCreate")
@@ -1144,7 +1144,7 @@ func TestDAG_ReduceTransitively(t *testing.T) {
 }
 
 func TestDAG_Copy(t *testing.T) {
-	d0 := NewDAG()
+	d0 := NewDAG[any]()
 
 	_, _ = d0.AddVertex(iVertex{1})
 	_, _ = d0.AddVertex(iVertex{2})
@@ -1197,7 +1197,7 @@ func TestDAG_Copy(t *testing.T) {
 }
 
 func TestDAG_String(t *testing.T) {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 	v1, _ := dag.AddVertex("1")
 	v2, _ := dag.AddVertex("2")
 	v3, _ := dag.AddVertex("3")
@@ -1235,7 +1235,7 @@ func TestErrors(t *testing.T) {
 }
 
 func ExampleDAG_AncestorsWalker() {
-	dag := NewDAG()
+	dag := NewDAG[any]()
 
 	v1, _ := dag.AddVertex(iVertex{1})
 	v2, _ := dag.AddVertex(iVertex{2})
@@ -1263,7 +1263,7 @@ func ExampleDAG_AncestorsWalker() {
 }
 
 func TestLarge(t *testing.T) {
-	d := NewDAG()
+	d := NewDAG[any]()
 	root := iVertex{1}
 	id, _ := d.addVertex(root)
 	levels := 7
@@ -1301,7 +1301,7 @@ func TestLarge(t *testing.T) {
 	*/
 }
 
-func largeAux(d *DAG, level int, branches int, parent iVertex) (int, int) {
+func largeAux(d *DAG[any], level int, branches int, parent iVertex) (int, int) {
 	var vertexCount int
 	var edgeCount int
 	if level > 1 {

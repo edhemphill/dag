@@ -1,32 +1,32 @@
 package dag
 
-type testVertex struct {
+type testVertex[T comparable] struct {
 	WID string `json:"i"`
-	Val string `json:"v"`
+	Val T      `json:"v"`
 }
 
-func (tv testVertex) ID() string {
+func (tv testVertex[T]) ID() string {
 	return tv.WID
 }
 
-func (tv testVertex) Vertex() (id string, value interface{}) {
+func (tv testVertex[T]) Vertex() (id string, value T) {
 	return tv.WID, tv.Val
 }
 
-type testStorableDAG struct {
-	StorableVertices []testVertex   `json:"vs"`
-	StorableEdges    []storableEdge `json:"es"`
+type testStorableDAG[T comparable] struct {
+	StorableVertices []testVertex[T] `json:"vs"`
+	StorableEdges    []storableEdge  `json:"es"`
 }
 
-func (g testStorableDAG) Vertices() []Vertexer {
-	l := make([]Vertexer, 0, len(g.StorableVertices))
+func (g testStorableDAG[T]) Vertices() []Vertexer[T] {
+	l := make([]Vertexer[T], 0, len(g.StorableVertices))
 	for _, v := range g.StorableVertices {
 		l = append(l, v)
 	}
 	return l
 }
 
-func (g testStorableDAG) Edges() []Edger {
+func (g testStorableDAG[T]) Edges() []Edger {
 	l := make([]Edger, 0, len(g.StorableEdges))
 	for _, v := range g.StorableEdges {
 		l = append(l, v)

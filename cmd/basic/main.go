@@ -8,7 +8,7 @@ import (
 func main() {
 
 	// initialize a new graph
-	d := dag.NewDAG()
+	d := dag.NewDAG[int]()
 
 	// init three vertices
 	v1, _ := d.AddVertex(1)

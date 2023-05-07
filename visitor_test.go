@@ -6,28 +6,29 @@ import (
 	"github.com/go-test/deep"
 )
 
-type testVisitor struct {
-	Values []string
+type testVisitor[T comparable] struct {
+	Values []T
 }
 
-func (pv *testVisitor) Visit(v Vertexer) {
+func (pv *testVisitor[T]) Visit(v Vertexer[T]) {
 	_, value := v.Vertex()
-	pv.Values = append(pv.Values, value.(string))
+	pv.Values = append(pv.Values, value)
 }
 
 // schematic diagram:
-//     v5
-//     ^
-//     |
-//     v4
-//     ^
-//     |
-//     v2 --> v3
-//     ^
-//     |
-//     v1
-func getTestWalkDAG() *DAG {
-	dag := NewDAG()
+//
+//	v5
+//	^
+//	|
+//	v4
+//	^
+//	|
+//	v2 --> v3
+//	^
+//	|
+//	v1
+func getTestWalkDAG() *DAG[string] {
+	dag := NewDAG[string]()
 
 	v1, v2, v3, v4, v5 := "1", "2", "3", "4", "5"
 	_ = dag.AddVertexByID(v1, "v1")
@@ -44,15 +45,16 @@ func getTestWalkDAG() *DAG {
 }
 
 // schematic diagram:
-//    v4 --> v5
-//           ^
-//           |
-//    v1 --> v3
-//           ^
-//           |
-//          v2
-func getTestWalkDAG2() *DAG {
-	dag := NewDAG()
+//
+//	v4 --> v5
+//	       ^
+//	       |
+//	v1 --> v3
+//	       ^
+//	       |
+//	      v2
+func getTestWalkDAG2() *DAG[string] {
+	dag := NewDAG[string]()
 
 	v1, v2, v3, v4, v5 := "1", "2", "3", "4", "5"
 	_ = dag.AddVertexByID(v1, "v1")
@@ -69,15 +71,16 @@ func getTestWalkDAG2() *DAG {
 }
 
 // schematic diagram:
-//    v4 --> v5
+//
+//	v4 --> v5
 //
 //
-//    v1 --> v3
-//           ^
-//           |
-//          v2
-func getTestWalkDAG3() *DAG {
-	dag := NewDAG()
+//	v1 --> v3
+//	       ^
+//	       |
+//	      v2
+func getTestWalkDAG3() *DAG[string] {
+	dag := NewDAG[string]()
 
 	v1, v2, v3, v4, v5 := "1", "2", "3", "4", "5"
 	_ = dag.AddVertexByID(v1, "v1")
@@ -93,15 +96,16 @@ func getTestWalkDAG3() *DAG {
 }
 
 // schematic diagram:
-//     v4     v5
-//     ^      ^
-//     |      |
-//     v2 --> v3
-//     ^
-//     |
-//     v1
-func getTestWalkDAG4() *DAG {
-	dag := NewDAG()
+//
+//	v4     v5
+//	^      ^
+//	|      |
+//	v2 --> v3
+//	^
+//	|
+//	v1
+func getTestWalkDAG4() *DAG[string] {
+	dag := NewDAG[string]()
 
 	v1, v2, v3, v4, v5 := "1", "2", "3", "4", "5"
 	_ = dag.AddVertexByID(v1, "v1")
@@ -119,70 +123,91 @@ func getTestWalkDAG4() *DAG {
 
 func TestDFSWalk(t *testing.T) {
 	cases := []struct {
-		dag      *DAG
-		expected []string
+		Name     string
+		Dag      *DAG[string]
+		Expected []string
 	}{
 		{
-			dag:      getTestWalkDAG(),
-			expected: []string{"v1", "v2", "v3", "v4", "v5"},
+			Name:     "1",
+			Dag:      getTestWalkDAG(),
+			Expected: []string{"v1", "v2", "v3", "v4", "v5"},
 		},
 		{
-			dag:      getTestWalkDAG2(),
-			expected: []string{"v1", "v3", "v5", "v2", "v4"},
+			Name:     "2",
+			Dag:      getTestWalkDAG2(),
+			Expected: []string{"v1", "v3", "v5", "v2", "v4"},
 		},
 		{
-			dag:      getTestWalkDAG3(),
-			expected: []string{"v1", "v3", "v2", "v4", "v5"},
+			Name:     "3",
+			Dag:      getTestWalkDAG3(),
+			Expected: []string{"v1", "v3", "v2", "v4", "v5"},
 		},
 		{
-			dag:      getTestWalkDAG4(),
-			expected: []string{"v1", "v2", "v3", "v5", "v4"},
+			Name:     "4",
+			Dag:      getTestWalkDAG4(),
+			Expected: []string{"v1", "v2", "v3", "v5", "v4"},
 		},
 	}
 
 	for _, c := range cases {
-		pv := &testVisitor{}
-		c.dag.DFSWalk(pv)
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			t.Parallel()
 
-		expected := c.expected
-		actual := pv.Values
-		if deep.Equal(expected, actual) != nil {
-			t.Errorf("DFSWalk() = %v, want %v", actual, expected)
-		}
+			pv := &testVisitor[string]{}
+			c.Dag.DFSWalk(pv)
+
+			expected := c.Expected
+			actual := pv.Values
+			if deep.Equal(expected, actual) != nil {
+				t.Errorf("DFSWalk() = %v, want %v", actual, expected)
+			}
+
+		})
 	}
 }
 
 func TestBFSWalk(t *testing.T) {
 	cases := []struct {
-		dag      *DAG
-		expected []string
+		Name     string
+		Dag      *DAG[string]
+		Expected []string
 	}{
 		{
-			dag:      getTestWalkDAG(),
-			expected: []string{"v1", "v2", "v3", "v4", "v5"},
+			Name:     "1",
+			Dag:      getTestWalkDAG(),
+			Expected: []string{"v1", "v2", "v3", "v4", "v5"},
 		},
 		{
-			dag:      getTestWalkDAG2(),
-			expected: []string{"v1", "v2", "v4", "v3", "v5"},
+			Name:     "2",
+			Dag:      getTestWalkDAG2(),
+			Expected: []string{"v1", "v2", "v4", "v3", "v5"},
 		},
 		{
-			dag:      getTestWalkDAG3(),
-			expected: []string{"v1", "v2", "v4", "v3", "v5"},
+			Name:     "3",
+			Dag:      getTestWalkDAG3(),
+			Expected: []string{"v1", "v2", "v4", "v3", "v5"},
 		},
 		{
-			dag:      getTestWalkDAG4(),
-			expected: []string{"v1", "v2", "v3", "v4", "v5"},
+			Name:     "4",
+			Dag:      getTestWalkDAG4(),
+			Expected: []string{"v1", "v2", "v3", "v4", "v5"},
 		},
 	}
 
 	for _, c := range cases {
-		pv := &testVisitor{}
-		c.dag.BFSWalk(pv)
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			t.Parallel()
 
-		expected := c.expected
-		actual := pv.Values
-		if deep.Equal(expected, actual) != nil {
-			t.Errorf("BFSWalk() = %v, want %v", actual, expected)
-		}
+			pv := &testVisitor[string]{}
+			c.Dag.BFSWalk(pv)
+
+			expected := c.Expected
+			actual := pv.Values
+			if deep.Equal(expected, actual) != nil {
+				t.Errorf("BFSWalk() = %v, want %v", actual, expected)
+			}
+		})
 	}
 }

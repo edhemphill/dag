@@ -17,7 +17,7 @@ func (v largeVertex) ID() string {
 }
 
 func main() {
-	d := dag.NewDAG()
+	d := dag.NewDAG[largeVertex]()
 	root := largeVertex{1}
 	key, _ := d.AddVertex(root)
 	levels := 7
@@ -98,7 +98,7 @@ func main() {
 
 }
 
-func largeAux(d *dag.DAG, level int, branches int, parent largeVertex) (int, int) {
+func largeAux(d *dag.DAG[largeVertex], level int, branches int, parent largeVertex) (int, int) {
 	var vertexCount int
 	var edgeCount int
 	if level > 1 {

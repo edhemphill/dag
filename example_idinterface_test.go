@@ -17,7 +17,7 @@ func (v idVertex) ID() string {
 func ExampleIDInterface() {
 
 	// initialize a new graph
-	d := dag.NewDAG()
+	d := dag.NewDAG[idVertex]()
 
 	// init three vertices
 	id, _ := d.AddVertex(idVertex{id: "1", msg: "foo"})

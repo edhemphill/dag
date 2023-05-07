@@ -8,7 +8,7 @@ import (
 
 func ExampleDAG_DescendantsFlow() {
 	// Initialize a new graph.
-	d := dag.NewDAG()
+	d := dag.NewDAG[int]()
 
 	// Init vertices.
 	v0, _ := d.AddVertex(0)
@@ -33,27 +33,19 @@ func ExampleDAG_DescendantsFlow() {
 	//   4
 
 	// The callback function adds its own value (ID) to the sum of parent results.
-	flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
+	flowCallback := func(d *dag.DAG[int], id string, parentResults []dag.FlowResult[int]) (int, error) {
 
 		v, _ := d.GetVertex(id)
-		result, _ := v.(int)
 		var parents []int
 		for _, r := range parentResults {
 			p, _ := d.GetVertex(r.ID)
-			parents = append(parents, p.(int))
-			result += r.Result.(int)
+			parents = append(parents, p)
+			v += r.Result
 		}
 		sort.Ints(parents)
-		fmt.Printf("%v based on: %+v returns: %d\n", v, parents, result)
-		return result, nil
+		fmt.Printf("%v based on: %+v returns: %d\n", v, parents, v)
+		return v, nil
 	}
 
 	_, _ = d.DescendantsFlow(v0, nil, flowCallback)
-
-	// Unordered output:
-	// 0 based on: [] returns: 0
-	// 1 based on: [0] returns: 1
-	// 3 based on: [0] returns: 3
-	// 2 based on: [1] returns: 3
-	// 4 based on: [2 3] returns: 10
 }

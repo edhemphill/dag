@@ -9,14 +9,14 @@ import (
 //
 // It traverses the DAG using the Depth-First-Search algorithm
 // and uses an internal structure to store vertices and edges.
-func (d *DAG) MarshalJSON() ([]byte, error) {
+func (d *DAG[T]) MarshalJSON() ([]byte, error) {
 	mv := newMarshalVisitor(d)
 	d.DFSWalk(mv)
 	return json.Marshal(mv.storableDAG)
 }
 
 // UnmarshalJSON is an informative method. See the UnmarshalJSON function below.
-func (d *DAG) UnmarshalJSON(_ []byte) error {
+func (d *DAG[T]) UnmarshalJSON(_ []byte) error {
 	return errors.New("this method is not supported, request function UnmarshalJSON instead")
 }
 
@@ -32,22 +32,25 @@ func (d *DAG) UnmarshalJSON(_ []byte) error {
 // Example:
 // dag := NewDAG()
 // data, err := json.Marshal(d)
-// if err != nil {
-//     panic(err)
-// }
+//
+//	if err != nil {
+//	    panic(err)
+//	}
+//
 // var wd YourStorableDAG
 // restoredDag, err := UnmarshalJSON(data, &wd)
-// if err != nil {
-//     panic(err)
-// }
+//
+//	if err != nil {
+//	    panic(err)
+//	}
 //
 // For more specific information please read the test code.
-func UnmarshalJSON(data []byte, wd StorableDAG) (*DAG, error) {
+func UnmarshalJSON[T comparable](data []byte, wd StorableDAG[T]) (*DAG[T], error) {
 	err := json.Unmarshal(data, &wd)
 	if err != nil {
 		return nil, err
 	}
-	dag := NewDAG()
+	dag := NewDAG[T]()
 	for _, v := range wd.Vertices() {
 		errVertex := dag.AddVertexByID(v.Vertex())
 		if errVertex != nil {
@@ -63,16 +66,16 @@ func UnmarshalJSON(data []byte, wd StorableDAG) (*DAG, error) {
 	return dag, nil
 }
 
-type marshalVisitor struct {
-	d *DAG
-	storableDAG
+type marshalVisitor[T comparable] struct {
+	d *DAG[T]
+	storableDAG[T]
 }
 
-func newMarshalVisitor(d *DAG) *marshalVisitor {
-	return &marshalVisitor{d: d}
+func newMarshalVisitor[T comparable](d *DAG[T]) *marshalVisitor[T] {
+	return &marshalVisitor[T]{d: d}
 }
 
-func (mv *marshalVisitor) Visit(v Vertexer) {
+func (mv *marshalVisitor[T]) Visit(v Vertexer[T]) {
 	mv.StorableVertices = append(mv.StorableVertices, v)
 
 	srcID, _ := v.Vertex()

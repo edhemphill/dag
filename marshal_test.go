@@ -9,55 +9,63 @@ import (
 
 func TestMarshalUnmarshalJSON(t *testing.T) {
 	cases := []struct {
-		dag      *DAG
-		expected string
+		Name     string
+		Dag      *DAG[string]
+		Expected string
 	}{
 		{
-			dag:      getTestWalkDAG(),
-			expected: `{"vs":[{"i":"1","v":"v1"},{"i":"2","v":"v2"},{"i":"3","v":"v3"},{"i":"4","v":"v4"},{"i":"5","v":"v5"}],"es":[{"s":"1","d":"2"},{"s":"2","d":"3"},{"s":"2","d":"4"},{"s":"4","d":"5"}]}`,
+			Name:     "1",
+			Dag:      getTestWalkDAG(),
+			Expected: `{"vs":[{"i":"1","v":"v1"},{"i":"2","v":"v2"},{"i":"3","v":"v3"},{"i":"4","v":"v4"},{"i":"5","v":"v5"}],"es":[{"s":"1","d":"2"},{"s":"2","d":"3"},{"s":"2","d":"4"},{"s":"4","d":"5"}]}`,
 		},
 		{
-			dag:      getTestWalkDAG2(),
-			expected: `{"vs":[{"i":"1","v":"v1"},{"i":"3","v":"v3"},{"i":"5","v":"v5"},{"i":"2","v":"v2"},{"i":"4","v":"v4"}],"es":[{"s":"1","d":"3"},{"s":"3","d":"5"},{"s":"2","d":"3"},{"s":"4","d":"5"}]}`,
+			Name:     "2",
+			Dag:      getTestWalkDAG2(),
+			Expected: `{"vs":[{"i":"1","v":"v1"},{"i":"3","v":"v3"},{"i":"5","v":"v5"},{"i":"2","v":"v2"},{"i":"4","v":"v4"}],"es":[{"s":"1","d":"3"},{"s":"3","d":"5"},{"s":"2","d":"3"},{"s":"4","d":"5"}]}`,
 		},
 		{
-			dag:      getTestWalkDAG3(),
-			expected: `{"vs":[{"i":"1","v":"v1"},{"i":"3","v":"v3"},{"i":"2","v":"v2"},{"i":"4","v":"v4"},{"i":"5","v":"v5"}],"es":[{"s":"1","d":"3"},{"s":"2","d":"3"},{"s":"4","d":"5"}]}`,
+			Name:     "3",
+			Dag:      getTestWalkDAG3(),
+			Expected: `{"vs":[{"i":"1","v":"v1"},{"i":"3","v":"v3"},{"i":"2","v":"v2"},{"i":"4","v":"v4"},{"i":"5","v":"v5"}],"es":[{"s":"1","d":"3"},{"s":"2","d":"3"},{"s":"4","d":"5"}]}`,
 		},
 		{
-			dag:      getTestWalkDAG4(),
-			expected: `{"vs":[{"i":"1","v":"v1"},{"i":"2","v":"v2"},{"i":"3","v":"v3"},{"i":"5","v":"v5"},{"i":"4","v":"v4"}],"es":[{"s":"1","d":"2"},{"s":"2","d":"3"},{"s":"2","d":"4"},{"s":"3","d":"5"}]}`,
+			Name:     "4",
+			Dag:      getTestWalkDAG4(),
+			Expected: `{"vs":[{"i":"1","v":"v1"},{"i":"2","v":"v2"},{"i":"3","v":"v3"},{"i":"5","v":"v5"},{"i":"4","v":"v4"}],"es":[{"s":"1","d":"2"},{"s":"2","d":"3"},{"s":"2","d":"4"},{"s":"3","d":"5"}]}`,
 		},
 	}
 
 	for _, c := range cases {
-		testMarshalUnmarshalJSON(t, c.dag, c.expected)
-	}
-}
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			t.Parallel()
 
-func testMarshalUnmarshalJSON(t *testing.T, d *DAG, expected string) {
-	data, err := json.Marshal(d)
-	if err != nil {
-		t.Error(err)
-	}
+			data, err := json.Marshal(c.Dag)
+			if err != nil {
+				t.Error(err)
+			}
 
-	actual := string(data)
-	if deep.Equal(expected, actual) != nil {
-		t.Errorf("Marshal() = %v, want %v", actual, expected)
-	}
+			actual := string(data)
+			if deep.Equal(c.Expected, actual) != nil {
+				t.Errorf("Marshal() = %v, want %v", actual, c.Expected)
+			}
 
-	d1 := &DAG{}
-	errNotSupported := json.Unmarshal(data, d1)
-	if errNotSupported == nil {
-		t.Errorf("UnmarshalJSON() = nil, want %v", "This method is not supported")
-	}
+			d1 := &DAG[string]{}
+			errNotSupported := json.Unmarshal(data, d1)
+			if errNotSupported == nil {
+				t.Errorf("UnmarshalJSON() = nil, want %v", "This method is not supported")
+			}
 
-	var wd testStorableDAG
-	dag, err := UnmarshalJSON(data, &wd)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if deep.Equal(d, dag) != nil {
-		t.Errorf("UnmarshalJSON() = %v, want %v", dag.String(), d.String())
+			var wd testStorableDAG[string]
+			dag, err := UnmarshalJSON[string](data, &wd)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if deep.Equal(c.Dag, dag) != nil {
+				t.Errorf("UnmarshalJSON() = %v, want %v", dag.String(), c.Dag.String())
+			}
+
+		})
+
 	}
 }

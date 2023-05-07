@@ -13,7 +13,7 @@ type foobar struct {
 func Example() {
 
 	// initialize a new graph
-	d := dag.NewDAG()
+	d := dag.NewDAG[any]()
 
 	// init three vertices
 	v1, _ := d.AddVertex(1)
