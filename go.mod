@@ -1,4 +1,4 @@
-module dag
+module github.com/edhemphill/dag
 
 go 1.20
 
