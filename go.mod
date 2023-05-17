@@ -1,4 +1,4 @@
-module github.com/heimdalr/dag
+module dag
 
 go 1.20
 
